@@ -8,9 +8,7 @@ const cssRegex = /\.css$/;
 const cssModuleRegex = /\.module\.css$/;
 const sassRegex = /\.(scss||sass)$/;
 const sassModuleRegex = /\.module\.(scss||sass)$/;
-
-const publicUrl = paths.servedPath.slice(0, -1);
-const env = getClientEnvironment(publicUrl);
+const env = getClientEnvironment(paths.publicUrlOrPath.slice(0, -1));
 
 module.exports = {
   mode: "production", // 프로덕션 모드로 설정하여 최적화 옵션들을 활성화
@@ -20,7 +18,7 @@ module.exports = {
     path: paths.ssrBuild, // 빌드 경로
     filename: "server.js", // 파일 이름
     chunkFilename: "js/[name].chunk.js", // 청크 파일 이름
-    publicPath: paths.servedPath // 정적 파일이 제공될 경로
+    publicPath: paths.publicUrlOrPath // 정적 파일이 제공될 경로
   },
   module: {
     rules: [
@@ -64,8 +62,8 @@ module.exports = {
           },
           // css module을 위한 처리
           {
-            text: cssModuleRegex,
-            loade: require.resolve("css-loader"),
+            test: cssModuleRegex,
+            loader: require.resolve("css-loader"),
             options: {
               modules: true,
               exportOnlyLocals: true,
@@ -74,7 +72,7 @@ module.exports = {
           },
           // sass를 위한 처리
           {
-            text: sassRegex,
+            test: sassRegex,
             exclude: sassModuleRegex,
             use: [
               {
@@ -88,7 +86,7 @@ module.exports = {
           },
           // sass+css module을 위한 처리
           {
-            text: sassRegex,
+            test: sassRegex,
             exclude: sassModuleRegex,
             use: [
               {
@@ -130,7 +128,7 @@ module.exports = {
     modules: ["node_modules"]
   },
   externals: [nodeExternals()],
-  plugin: [
+  plugins: [
     new webpack.DefinePlugin(env.stringified) // 환경변수를 주입해 준다
     //환경변수를 주입하면, 프로젝트 내에서 process.env.NODE_ENV값을 참조하여 현재 개발 환경인지 아닌지를 알수 있다.
   ]
